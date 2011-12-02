@@ -11,7 +11,7 @@ require 'mime/types'
 module Net
   class HTTP
     def urlencode(str)
-      str.gsub(/[^a-zA-Z0-9_\.\-]/n) {|s| sprintf('%%%02x', s[0]) }
+      str.gsub(/[^a-zA-Z0-9_\.\-]/n) {|s| sprintf('%%%02x', s[0].ord) }
     end
 
     def post_form(path, params)
