@@ -3,7 +3,7 @@
 require "net/http"
 require 'net/https'
 require "rubygems"
-require 'xmlsimple'
+require 'json'
 require "time"
 require 'mime/types'
 
@@ -99,7 +99,7 @@ res = http.post_form("/#{repo}/downloads", {
 })
 die "Repo not found" if res.class == Net::HTTPNotFound
 date = res["Date"]
-data = XmlSimple.xml_in(res.body)
+data = JSON.parse(res.body)
 die "Unable to authorize upload" if data["signature"].nil?
 
 
@@ -107,12 +107,12 @@ die "Unable to authorize upload" if data["signature"].nil?
 url = URI.parse "http://github.s3.amazonaws.com/"
 http = Net::HTTP.new url.host, url.port
 res = http.post_multipart("/", {
-  :key => "#{data["prefix"].first}#{filename}",
+  :key => "#{data["prefix"]}#{filename}",
   :Filename => filename,
-  :policy => data["policy"].first,
-  :AWSAccessKeyId => data["accesskeyid"].first,
-  :signature => data["signature"].first,
-  :acl => data["acl"].first,
+  :policy => data["policy"],
+  :AWSAccessKeyId => data["accesskeyid"],
+  :signature => data["signature"],
+  :acl => data["acl"],
   :file => file,
   :success_action_status => 201
 })
